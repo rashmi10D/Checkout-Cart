@@ -1,69 +1,50 @@
-const productRepository = require("./repository");
-exports.createProduct = async (req, res) => {
-  try {
-    let payload = {
-      name: req.body.name,
-      price: req.body.price,
-    };
-    let product = await productRepository.createProduct({
-      ...payload,
-    });
-    res.status(200).json({
-      status: true,
-      data: product,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      error: err,
-      status: false,
-    });
-  }
+const service = require("./service");
+
+/**
+ * Create Product
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+exports.createProduct = (req, res) => {
+  service.createproduct(req, (err, response) => {
+    if (err) {
+      res.status(400).json({ status: 400, error: err });
+    } else {
+      console.log(response);
+      res.status(200).json({ status: 200, data: response });
+    }
+  });
 };
-exports.getProducts = async (req, res) => {
-  console.log("here");
-  try {
-    let products = await productRepository.products();
-    res.status(200).json({
-      status: true,
-      data: products,
-    });
-  } catch (err) {
-    console.log("EROR",err);
-    res.status(500).json({
-      error: err,
-      status: false,
-    });
-  }
+/**
+ * get all Products
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.getProducts = (req, res) => {
+  service.getProducts(req, (err, response) => {
+    if (err) {
+      res.status(400).json({ status: 400, error: err });
+    } else {
+      console.log(response);
+      res.status(200).json({ status: 200, data: response });
+    }
+  });
 };
 
-exports.getProductById = async (req, res) => {
-  try {
-    let id = req.params.id;
-    let productDetails = await productRepository.productById(id);
-    res.status(200).json({
-      status: true,
-      data: productDetails,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      error: err,
-    });
-  }
+/**
+ *  get product by id
+ * @param {get product by id} req 
+ * @param {*} res 
+ */
+exports.getProductById = (req, res) => {
+  service.getProductById(req, (err, response) => {
+    if (err) {
+      res.status(400).json({ status: 400, error: err });
+    } else {
+      console.log(response);
+      res.status(200).json({ status: 200, data: response });
+    }
+  });
 };
-exports.removeProduct = async (req, res) => {
-  try {
-    let id = req.params.id;
-    let productDetails = await productRepository.removeProduct(id);
-    res.status(200).json({
-      status: true,
-      data: productDetails,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      error: err,
-    });
-  }
-};
+

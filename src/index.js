@@ -16,4 +16,4 @@ app.listen(port, () => {
   console.log(`Application is running on ${port}`);
 });
 require("./config/mongoose.js")(app);
-require("./app/routerHandler")(app);
+require("./app/routes")(app);
