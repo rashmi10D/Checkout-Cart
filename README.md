@@ -13,3 +13,6 @@ DATABASE_URL
 
 # Run
 npm start
+
+# Test 
+npm test

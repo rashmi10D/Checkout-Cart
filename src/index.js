@@ -17,3 +17,5 @@ app.listen(port, () => {
 });
 require("./config/mongoose.js")(app);
 require("./app/routes")(app);
+
+module.exports.app = app;
