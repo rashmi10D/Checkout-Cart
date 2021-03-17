@@ -11,7 +11,6 @@ exports.createProduct = (req, res) => {
     if (err) {
       res.status(400).json({ status: 400, error: err });
     } else {
-      console.log(response);
       res.status(200).json({ status: 200, data: response });
     }
   });
@@ -26,7 +25,6 @@ exports.getProducts = (req, res) => {
     if (err) {
       res.status(400).json({ status: 400, error: err });
     } else {
-      console.log(response);
       res.status(200).json({ status: 200, data: response });
     }
   });
@@ -42,7 +40,6 @@ exports.getProductById = (req, res) => {
     if (err) {
       res.status(400).json({ status: 400, error: err });
     } else {
-      console.log(response);
       res.status(200).json({ status: 200, data: response });
     }
   });

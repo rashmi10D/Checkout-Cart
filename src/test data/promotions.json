@@ -1,0 +1,44 @@
+
+{
+    "isEnabled": true,
+    "ruleId": "RULE001",
+    "ruleDescription": "if quantity is 2 or multiples of 3 then 5 rs discount will be given",
+    "product": "<id>",
+    "productName": "<id>",
+    "discountType": 1,
+    "discount": 5,
+    "date": "2021-09-25",
+    "quantity": 3,
+    "price": null,
+    "__v": 0
+}
+
+{
+    
+    "isEnabled": true,
+    "ruleId": "RULE002",
+    "ruleDescription": "if quantity is 3 or multiples of 3 then 5 rs discount will be given ",
+    "product": "<id>",
+    "productName": "<id>",
+    "discountType": 2,
+    "discount": 5,
+    "date": "2021-09-25",
+    "quantity": 2,
+    "price": null,
+    "__v": 0
+}
+
+{
+    
+    "isEnabled": true,
+    "ruleId": "RULE003",
+    "ruleDescription": " if total bascket is > 150, 20 rs will be given as discount",
+    "product": "BASKET",
+    "productName": "BASKET",
+    "discountType": 3,
+    "discount": 20,
+    "date": "2021-09-25",
+    "quantity": null,
+    "price": 150,
+    "__v": 0
+}

@@ -6,8 +6,10 @@ MongoDB
 
 # database name 
 cart
+
+# test data can be used to insert records in DB through various API's can be done using the json files in "test data" directory   
 # env
-DATABASE_URL=mongodb://localhost:27017/cart
+DATABASE_URL
 
 # Run
 npm start

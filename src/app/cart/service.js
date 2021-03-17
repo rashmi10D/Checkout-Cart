@@ -1,19 +1,18 @@
 const cartRepository = require("./repo");
 const productRepository = require("../product/repo");
+const async = require("async");
+const promotionReposiatry = require("../promotion/repository");
 
 exports.getCart = async (req, callback) => {
   try {
     let cart = await cartRepository.cart();
-    console.log("in getCart", cart);
     callback(undefined, cart);
   } catch (err) {
-    console.log("in getProducts", err);
     callback(err, undefined);
   }
 };
 
 exports.addItemToCart = async (req, callback) => {
-
   const { productId } = req.body;
   const quantity = Number.parseInt(req.body.quantity);
   try {
@@ -65,7 +64,6 @@ exports.addItemToCart = async (req, callback) => {
       }
       let data = await cart.save();
       callback(undefined, cart);
-
     } else {
       const cartData = {
         items: [
@@ -85,3 +83,112 @@ exports.addItemToCart = async (req, callback) => {
     callback(err, undefined);
   }
 };
+
+exports.checkout = async (callback) => {
+  let cart = await cartRepository.cart();
+
+  let checkoutItem = [];
+
+  let totalCartItems = cart.items;
+// console.log(totalCartItems, "totalCartItems");
+  async.forEach(totalCartItems, (item, i) => {
+    let productId = item.productId._id;
+    checkoutItem.push(
+      new Promise((resolve, reject) => {
+        promotionReposiatry.getPromotionByProductId(
+          productId,
+          (errpro, promotion) => {
+            let finalPriceCartItem = {};
+            finalPriceCartItem.productId = item.productId._id;
+            finalPriceCartItem.product = item.productId.name;
+            finalPriceCartItem.subTotal = item.total;
+            finalPriceCartItem.price = item.price;
+            finalPriceCartItem.quantity = item.quantity;
+
+            if (promotion && promotion.isEnabled) {
+              finalPriceCartItem.total = findTotalPriceAfterDis(
+                promotion,
+                item
+              );
+            } else {
+              finalPriceCartItem.total = item.total;
+            }
+            finalPriceCartItem.discount = item.total - finalPriceCartItem.total;
+            if (promotion) {
+              finalPriceCartItem.promotionId = promotion._id;
+              finalPriceCartItem.ruleId = promotion.ruleId;
+              finalPriceCartItem.discountType = promotion.discountType;
+            } else {
+              finalPriceCartItem.promotionId = null;
+              finalPriceCartItem.ruleId = null;
+              finalPriceCartItem.discountType = null;
+            }
+            resolve(finalPriceCartItem);
+          }
+        );
+      })
+    );
+  });
+
+  Promise.all(checkoutItem)
+    .then((value) => {
+      let checkout = {};
+      let billTotal = 0;
+      let totalDiscount = 0;
+      let subTotal = 0;
+      for (var index in value) {
+        billTotal += value[index].total;
+        totalDiscount += value[index].discount;
+        subTotal += value[index].subTotal;
+      }
+
+      checkout.total = billTotal;
+      checkout.subTotal = subTotal;
+      checkout.discount = totalDiscount;
+      checkout.items = value;
+      promotionReposiatry.getPromotionByProductId("BASKET",(errpro, promotion) => {
+            
+          if (promotion && promotion.price < checkout.total) {
+            checkout.total = checkout.total - promotion.discount;
+          }
+
+          callback(checkout);
+        }
+      );
+    })
+    .catch((er) => {});
+};
+
+function findTotalPriceAfterDis(promotion, cartItem) {
+  let promotionType = promotion.discountType;
+  let quantity = cartItem.quantity;
+  let promoQuantity = promotion.quantity;
+  let totalAfterDiscount = 0;
+  if (promotionType == 1) {
+    totalAfterDiscount = cartItem.total;
+
+    if (promoQuantity <= quantity) {
+      let reminder = quantity % promoQuantity;
+
+      if (reminder == 0) {
+        let discount = quantity * promotion.discount;
+
+        totalAfterDiscount = cartItem.total - discount;
+      }
+    }
+  } else if (promotionType == 2) {
+    totalAfterDiscount = cartItem.total;
+
+    if (promoQuantity <= quantity) {
+      let reminder = quantity % promoQuantity;
+
+      if (reminder == 0) {
+        let discountItemCount = quantity / promoQuantity;
+        let discount = discountItemCount * promotion.discount;
+        totalAfterDiscount = cartItem.total - discount;
+      }
+    }
+  }
+
+  return totalAfterDiscount;
+}
