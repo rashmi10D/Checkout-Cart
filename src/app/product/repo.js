@@ -4,7 +4,6 @@ exports.products = async () => {
   return products;
 };
 exports.productById = async (id) => {
-  console.log(id);
   const product = await Product.findById(id);
   return product;
 };
