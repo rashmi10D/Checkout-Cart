@@ -1,36 +1,41 @@
+
+
+
 const supertest = require ('supertest');
 const { app} = require('../src/index');
 
-describe("Testing the checkout API", () => {
-
+    
+describe("Testing the carts  API", () => {
     let productA = null;
     let productB = null;
     let productC = null;
     let productD = null;
-    it ("add the product a", async () =>{
+    
+    it ("add the product A,B,C ", async () =>{
 
+        await supertest(app).delete('/cart/empty-cart');
           productA = await supertest(app).post('/product').send({
     
-            "name": "A",
+            "name": "a",
             "price": 30
         });
 
          productB = await supertest(app).post('/product').send({
     
-            "name": "B",
+            "name": "b",
             "price": 20
         });
 
 
          productC = await supertest(app).post('/product').send({
     
-            "name": "C",
+            "name": "c",
             "price": 50
         });
 
         productD = await supertest(app).post('/product').send({
     
-            "name": "D",
+            "name": "d",
             "price": 15
         });
 
@@ -38,7 +43,7 @@ describe("Testing the checkout API", () => {
         await supertest(app).post('/promotion').send({
             "ruleId": "RULE001",
             "ruleDescription": "if quantity is 3 or multiples of 3 then 5 rs discount will be given",
-            "product": productA._id,
+            "product": productA.body.data._id,
             "productName": "A",
             "discount": 5,
             "discountType": 1,
@@ -52,7 +57,7 @@ describe("Testing the checkout API", () => {
         await supertest(app).post('/promotion').send({
             "ruleId": "RULE002",
             "ruleDescription": "if quantity is 3 or multiples of 3 then 5 rs discount will be given",
-            "product": productB._id,
+            "product": productB.body.data._id,
             "productName": "B",
             "discount": 5,
             "discountType": 2,
@@ -78,55 +83,134 @@ describe("Testing the checkout API", () => {
         })
 
 
-         await supertest(app).post('/cart').send({
+        await supertest(app).post('/cart').send({
     
-            "productId": productA._id,
+            "productId": productA.body.data._id,
             "quantity": 1
         })
 
         await supertest(app).post('/cart').send({
     
-            "productId": productB._id,
+            "productId": productB.body.data._id,
             "quantity": 1
         })
 
         await supertest(app).post('/cart').send({
     
-            "productId": productC._id,
+            "productId": productC.body.data._id,
             "quantity": 1
         })
 
-       let checkout =  await supertest(app).get('/cart/checout');
+       let checkout =  await supertest(app).get('/cart/checkout');
 
         expect(checkout.status).toBe(200);
         expect(checkout.body.status).toBe(true);
+        expect(checkout.body.data.total).toBe(100);
     })
 
-    it ("add the product a", async () =>{
 
-        product = await supertest(app).post('/product').send({
-   
-           "name": "A",
-           "price": 15
-       });
-
-       expect(product.status).toBe(200);
-       expect(product.body.status).toBe(true);
-   })
-
-
-
-    
-
-	it("tests the base route and returns true for status", async () => {
-
-        console.log("----response");
+	it(" A, A, A, B, B", async () => {
         //const response = [{ id: 3, url: "https://www.link3.dev" }];
-		const response = await supertest(app).get('/cart/checkout');
+         await supertest(app).delete('/cart/empty-cart');
+
+		await supertest(app).post('/cart').send({
     
-		expect(response.status).toBe(200);
-		expect(response.body.status).toBe(true);
+            "productId": productA.body.data._id,
+            "quantity": 3
+        })
+
+        await supertest(app).post('/cart').send({
+    
+            "productId": productB.body.data._id,
+            "quantity": 2
+        })
+
+       let checkout =  await supertest(app).get('/cart/checkout');
+
+        expect(checkout.status).toBe(200);
+        expect(checkout.body.status).toBe(true);
+        expect(checkout.body.data.total).toBe(110);
+    
+		
+
+	});
+
+    it("C, B, A, A, D, A, B", async () => {
+        //const response = [{ id: 3, url: "https://www.link3.dev" }];
+        await supertest(app).delete('/cart/empty-cart');
+
+		await supertest(app).post('/cart').send({
+    
+            "productId": productA.body.data._id,
+            "quantity": 3
+        })
+
+        await supertest(app).post('/cart').send({
+    
+            "productId": productB.body.data._id,
+            "quantity": 2
+        })
+
+        await supertest(app).post('/cart').send({
+    
+            "productId": productC.body.data._id,
+            "quantity": 1
+        })
+
+        await supertest(app).post('/cart').send({
+    
+            "productId": productD.body.data._id,
+            "quantity": 1
+        })
+
+       let checkout =  await supertest(app).get('/cart/checkout');
+
+        expect(checkout.status).toBe(200);
+        expect(checkout.body.status).toBe(true);
+        expect(checkout.body.data.total).toBe(155);
+    
+		
+
+	});
+
+
+
+    it("C,  A, A, D, A", async () => {
+        //const response = [{ id: 3, url: "https://www.link3.dev" }];
+        await supertest(app).delete('/cart/empty-cart');
+
+		await supertest(app).post('/cart').send({
+    
+            "productId": productA.body.data._id,
+            "quantity": 3
+        })
+
+        await supertest(app).post('/cart').send({
+    
+            "productId": productC.body.data._id,
+            "quantity": 1
+        })
+
+        await supertest(app).post('/cart').send({
+    
+            "productId": productD.body.data._id,
+            "quantity": 1
+        })
+
+       let checkout =  await supertest(app).get('/cart/checkout');
+
+        expect(checkout.status).toBe(200);
+        expect(checkout.body.status).toBe(true);
+        expect(checkout.body.data.total).toBe(140);
+    
+		
 
 	});
 
 });
+
+// describe("Testing the movies API", () => {
+//     it("tests our testing framework if it works", () => {
+//     expect(2).toBe(2);
+//   });
+// });

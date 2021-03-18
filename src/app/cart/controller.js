@@ -1,6 +1,7 @@
 const service = require("./service");
 const productRepository = require("../Product/repo");
 const cartService = require("./service")
+const cartRepository = require('./repo')
 
 /**
  * add item to cart
@@ -10,7 +11,6 @@ const cartService = require("./service")
 exports.addItemToCart = (req, res) => {
   service.addItemToCart(req, (err, response) => {
     if (err) {
-      console.log(err);
       res.status(400).json({ status: 400, error: err });
     } else {
       res.status(200).json({ status: 200, data: response });
@@ -34,10 +34,29 @@ exports.getCart = (req, res) => {
 };
 
 /**
- * Checkout 
+ * Empty Cart
  * @param {*} req 
  * @param {*} res 
  */
+exports.emptyCart = async (req, res) => {
+  try {
+    let cart = await cartRepository.cart();
+    cart.items = [];
+    cart.subTotal = 0;
+    let data = await cart.save();
+    res.status(200).json({
+      type: "success",
+      mgs: "Cart has been emptied",
+      data: data,
+    });
+  } catch (err) {
+    res.status(400).json({
+      type: "Invalid",
+      msg: "Something went wrong",
+      err: err,
+    });
+  }
+};
 exports.checkout = async (req, res) => {
 
   try {

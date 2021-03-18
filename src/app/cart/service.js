@@ -19,10 +19,10 @@ exports.addItemToCart = async (req, callback) => {
     let cart = await cartRepository.cart();
     let productDetails = await productRepository.productById(productId);
     if (!productDetails) {
-      callback(err, undefined);
+      return callback(err, undefined);
     }
     if (!quantity) {
-      callback(err, undefined);
+     return callback(err, undefined);
     }
     if (cart) {
       const indexFound = cart.items.findIndex(
@@ -63,7 +63,7 @@ exports.addItemToCart = async (req, callback) => {
         });
       }
       let data = await cart.save();
-      callback(undefined, cart);
+     return callback(undefined, cart);
     } else {
       const cartData = {
         items: [
@@ -78,9 +78,9 @@ exports.addItemToCart = async (req, callback) => {
       };
       cart = await cartRepository.addItem(cartData);
     }
-    callback(undefined, cart);
+    return callback(undefined, cart);
   } catch (err) {
-    callback(err, undefined);
+    return callback(err, undefined);
   }
 };
 
@@ -90,7 +90,6 @@ exports.checkout = async (callback) => {
   let checkoutItem = [];
 
   let totalCartItems = cart.items;
-// console.log(totalCartItems, "totalCartItems");
   async.forEach(totalCartItems, (item, i) => {
     let productId = item.productId._id;
     checkoutItem.push(
@@ -152,7 +151,7 @@ exports.checkout = async (callback) => {
             checkout.total = checkout.total - promotion.discount;
           }
 
-          callback(checkout);
+          return callback(checkout);
         }
       );
     })
